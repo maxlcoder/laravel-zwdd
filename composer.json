@@ -12,6 +12,7 @@
             "email": "liurenlin@hzanchu.com"
         }
     ],
+    "license": "MIT",
     "require": {
         "laravel/framework": "^9.0"
     },
