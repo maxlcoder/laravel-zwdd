@@ -18,6 +18,7 @@ class Zwdd
      */
     public function accessToken()
     {
+        return 'access_token';
         $cacheKey = 'zwdd:access_token:' . md5(config('zwdd.app_server') . '-' . config('zwdd.app_key'));
         $cacheToken = Cache::get($cacheKey);
         if ($cacheToken) {
@@ -30,6 +31,7 @@ class Zwdd
             'appsecret' => config('zwdd.app_secret'),
         ]);
         $result = $this->client->epaasCurl('GET', 3);
+        dd($result);
         if (!isset($result['success']) || !$result['success']) {
             return '';
         }

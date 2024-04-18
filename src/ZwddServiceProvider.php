@@ -11,4 +11,16 @@ class ZwddServiceProvider extends ServiceProvider
         $this->publishes([__DIR__.'/config/zwdd.php' => config_path('zwdd.php')], 'config');
     }
 
+    /**
+     * Register the application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->app->singleton('zwdd', function ($app) {
+            return new Zwdd();
+        });
+    }
+
 }
