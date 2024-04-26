@@ -126,11 +126,10 @@ class ZwddClient
         if (!empty($params)) {
             ksort($params, SORT_STRING);
         }
-
         if ($method == 'GET') {
-            $response = Http::withHeaders($headerAry)->get($url, $params);
+            $response = Http::withoutVerifying()->withHeaders($headerAry)->get($url, $params);
         } elseif ($method = 'POST') {
-            $response = Http::withHeaders($headerAry)->post($url, $params);
+            $response = Http::withoutVerifying()->withHeaders($headerAry)->asForm()->post($url, $params);
         }
         if (!$response->ok()) {
             throw new \Exception('请求失败');

@@ -18,7 +18,6 @@ class Zwdd
      */
     public function accessToken()
     {
-        return 'access_token';
         $cacheKey = 'zwdd:access_token:' . md5(config('zwdd.app_server') . '-' . config('zwdd.app_key'));
         $cacheToken = Cache::get($cacheKey);
         if ($cacheToken) {
@@ -31,7 +30,6 @@ class Zwdd
             'appsecret' => config('zwdd.app_secret'),
         ]);
         $result = $this->client->epaasCurl('GET', 3);
-        dd($result);
         if (!isset($result['success']) || !$result['success']) {
             return '';
         }
@@ -39,6 +37,25 @@ class Zwdd
         $ttl = $result['content']['data']['expiresIn'] - 600; // 提前十分钟过期
         Cache::put($cacheKey, $token, $ttl);
         return $token;
+    }
+
+    public function getUserInfo($code)
+    {
+        $api = '/rpc/oauth2/getuserinfo_bycode.json';
+        $token = $this->accessToken();
+        $this->client->setApiName($api);
+        $this->client->addParameters([
+            'access_token' => $token,
+            'code' => $code,
+        ]);
+        $result = $this->client->epaasCurl('POST', 3);
+        if (!isset($result['success']) || !$result['success']) {
+            return null;
+        }
+        if (!isset($result['content']['success']) || !$result['content']['success']) {
+            return null;
+        }
+        return $result['content']['data'];
     }
 
 }
