@@ -13,29 +13,28 @@ class ZwddClient
 
     public function __construct()
     {
-        $this->configs['epaas'] = [
-            'api_server' => config('zwdd.app_server'),
-            'api_key' => config('zwdd.app_key'),
-            'api_secret' => config('zwdd.app_secret'),
+        $this->configs['epaas'] = array(
             'api_version' => '1.0',
-            'api_timeout' => 3,// 超时时间，单位秒
-        ];
-
-        // 检查配置
-        if (empty($this->configs['epaas']['api_server'])) {
-            throw new \Exception('app_server 没有配置');
-        }
-        if (empty($this->configs['epaas']['api_key'])) {
-            throw new \Exception('api_key 没有配置');
-        }
-        if (empty($this->configs['epaas']['api_secret'])) {
-            throw new \Exception('api_secret 没有配置');
-        }
+            'api_timeout' => 3// 瓒呮椂鏃堕棿锛屽崟浣嶇
+        );
         $this->timestamp = time();
     }
 
     public function configs(){
         return $this->configs;
+    }
+
+    public function setDomain($domain)
+    {
+        $this->configs['epaas']['api_server']=$domain;
+    }
+
+    public function setAccessKey($accessKey){
+        $this->configs['epaas']['api_key'] = $accessKey;
+    }
+
+    public function setSecretKey($secretKey){
+        $this->configs['epaas']['api_secret'] = $secretKey;
     }
 
     public function setApiName($apiName)

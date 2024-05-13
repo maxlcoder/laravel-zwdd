@@ -8,9 +8,22 @@ class Zwdd
 {
     protected $client;
 
-    public function __construct()
+    protected $domain;
+
+    protected $appKey;
+
+    protected $appSecret;
+
+    public function setClient($appKey, $appSecret)
     {
+        $this->domain = config('zwdd.app_server');
+        $this->appKey = $appKey;
+        $this->appSecret = $appSecret;
         $this->client = new ZwddClient();
+        $this->client->setDomain($this->domain);
+        $this->client->setAccessKey($this->appKey);
+        $this->client->setSecretKey($this->appSecret);
+        return $this;
     }
 
     /**
@@ -18,7 +31,7 @@ class Zwdd
      */
     public function accessToken()
     {
-        $cacheKey = 'zwdd:access_token:' . md5(config('zwdd.app_server') . '-' . config('zwdd.app_key'));
+        $cacheKey = 'zwdd:access_token:' . md5($this->domain . '-' . $this->appKey);
         $cacheToken = Cache::get($cacheKey);
         if ($cacheToken) {
             return $cacheToken;
@@ -26,8 +39,8 @@ class Zwdd
         $api = '/gettoken.json';
         $this->client->setApiName($api);
         $this->client->addParameters([
-            'appkey' => config('zwdd.app_key'),
-            'appsecret' => config('zwdd.app_secret'),
+            'appkey' => $this->appKey,
+            'appsecret' => $this->appSecret,
         ]);
         $result = $this->client->epaasCurl('GET', 3);
         if (!isset($result['success']) || !$result['success']) {
@@ -47,6 +60,25 @@ class Zwdd
         $this->client->addParameters([
             'access_token' => $token,
             'code' => $code,
+        ]);
+        $result = $this->client->epaasCurl('POST', 3);
+        if (!isset($result['success']) || !$result['success']) {
+            return null;
+        }
+        if (!isset($result['content']['success']) || !$result['content']['success']) {
+            return null;
+        }
+        return $result['content']['data'];
+    }
+
+    public function appUser($authCode)
+    {
+        $api = '/rpc/oauth2/dingtalk_app_user.json';
+        $token = $this->accessToken();
+        $this->client->setApiName($api);
+        $this->client->addParameters([
+            'access_token' => $token,
+            'auth_code' => $authCode,
         ]);
         $result = $this->client->epaasCurl('POST', 3);
         if (!isset($result['success']) || !$result['success']) {
