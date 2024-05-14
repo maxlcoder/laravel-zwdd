@@ -14,16 +14,15 @@ class Zwdd
 
     protected $appSecret;
 
-    public function setClient($appKey, $appSecret)
+    public function __construct()
     {
         $this->domain = config('zwdd.app_server');
-        $this->appKey = $appKey;
-        $this->appSecret = $appSecret;
+        $this->appKey = config('zwdd.app_key');
+        $this->appSecret = config('zwdd.app_secret');
         $this->client = new ZwddClient();
         $this->client->setDomain($this->domain);
         $this->client->setAccessKey($this->appKey);
         $this->client->setSecretKey($this->appSecret);
-        return $this;
     }
 
     /**
