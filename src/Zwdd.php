@@ -3,7 +3,6 @@
 namespace Maxlcoder\LaravelZwdd;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class Zwdd
 {
@@ -78,7 +77,6 @@ class Zwdd
             'code' => $code,
         ]);
         $result = $this->client->epaasCurl('POST', 3);
-        Log::info('getScanUserInfo: ' . json_encode($result));
         if (!isset($result['success']) || !$result['success']) {
             return null;
         }
