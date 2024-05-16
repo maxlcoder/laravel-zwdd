@@ -11,18 +11,20 @@ class Zwdd
     protected $domain;
 
     protected $appKey;
-
     protected $appSecret;
+
+    protected $scanAppKey;
+    protected $scanAppSecret;
 
     public function __construct()
     {
         $this->domain = config('zwdd.app_server');
         $this->appKey = config('zwdd.app_key');
         $this->appSecret = config('zwdd.app_secret');
+        $this->scanAppKey = config('zwdd.scan_app_key');
+        $this->scanAppSecret = config('zwdd.scan_app_secret');
         $this->client = new ZwddClient();
         $this->client->setDomain($this->domain);
-        $this->client->setAccessKey($this->appKey);
-        $this->client->setSecretKey($this->appSecret);
     }
 
     /**
@@ -30,7 +32,17 @@ class Zwdd
      */
     public function accessToken()
     {
-        $cacheKey = 'zwdd:access_token:' . md5($this->domain . '-' . $this->appKey);
+        return $this->getAccessToken($this->appKey, $this->appSecret);
+    }
+
+    public function scanAccessToken()
+    {
+        return $this->getAccessToken($this->scanAppKey, $this->scanAppSecret);
+    }
+
+    private function getAccessToken($appKey, $appSecret)
+    {
+        $cacheKey = 'zwdd:access_token:' . md5($this->domain . '-' . $appKey);
         $cacheToken = Cache::get($cacheKey);
         if ($cacheToken) {
             return $cacheToken;
@@ -38,8 +50,8 @@ class Zwdd
         $api = '/gettoken.json';
         $this->client->setApiName($api);
         $this->client->addParameters([
-            'appkey' => $this->appKey,
-            'appsecret' => $this->appSecret,
+            'appkey' => $appKey,
+            'appsecret' => $appSecret,
         ]);
         $result = $this->client->epaasCurl('GET', 3);
         if (!isset($result['success']) || !$result['success']) {
@@ -51,10 +63,10 @@ class Zwdd
         return $token;
     }
 
-    public function getUserInfo($code)
+    public function getScanUserInfo($code)
     {
         $api = '/rpc/oauth2/getuserinfo_bycode.json';
-        $token = $this->accessToken();
+        $token = $this->scanAccessToken();
         $this->client->setApiName($api);
         $this->client->addParameters([
             'access_token' => $token,
@@ -70,7 +82,7 @@ class Zwdd
         return $result['content']['data'];
     }
 
-    public function appUser($authCode)
+    public function getAppUser($authCode)
     {
         $api = '/rpc/oauth2/dingtalk_app_user.json';
         $token = $this->accessToken();
