@@ -32,11 +32,15 @@ class Zwdd
      */
     public function accessToken()
     {
+        $this->client->setAccessKey($this->appKey);
+        $this->client->setSecretKey($this->appSecret);
         return $this->getAccessToken($this->appKey, $this->appSecret);
     }
 
     public function scanAccessToken()
     {
+        $this->client->setAccessKey($this->scanAppKey);
+        $this->client->setSecretKey($this->scanAppSecret);
         return $this->getAccessToken($this->scanAppKey, $this->scanAppSecret);
     }
 
